@@ -1,0 +1,558 @@
+---
+title: "第一回 IRUMA.R 初心者セッション"
+author: "T-3"
+date: "2024-02-10"
+output: 
+  html_document:
+      toc: true
+      toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(leaflet)
+library(fontawesome)
+```
+
+<style>
+
+/* styles.css */
+
+body {
+  font-family: "Arial", sans-serif;
+  line-height: 1.6;
+}
+
+section {
+  margin-bottom: 20px;
+}
+</style>
+
+
+
+# イントロ
+
+## ひきつづき、T-3にてお送りします。
+
+初心者でも始めやすいをモットーに、IRUMA.Rでも初心者セッションをやります！
+
+
+内容は徐々によくしていきたい。なんならRStudio IDEの使い方はハンズオンでもいい･･･
+
+
+
+## R言語はじめ時ですよ！
+
+* 初心者に優しい！
+
+* Tokyo.R
+
+* r-wakalang @ slack
+
+* tidyverseが成熟して大きな変更がなくなった。枯れた=使う側は安心。
+
+
+この資料もRMarkdown（Quartoじゃなくてごめんなさいね…）で作られています。
+
+凝ったスライドじゃなくても大丈夫！むしろ結果が眺められて素のhtml出力もいいものですよ。
+
+## R言語は何が出来るの？
+
+だいたいなんでも！
+
+* 様々な図（グラフ）
+  * 棒グラフ、折れ線グラフ、散布図、などなど
+* 統計的な分析、モデリング、機械学習なども
+  * 前段階の
+* ブログやサイト
+* ドキュメント、書籍、名刺、発表用スライド
+
+
+# 入門編
+
+## RとRStudioのセッティング
+
+* [Posit社](https://posit.co/)
+
+
+* Windows版は[インストーラをダウンロード](https://cran.r-project.org/bin/windows/base/)してインストール
+
+![](images/clipboard-2434989427.png)
+
+* [RStudioも環境にあったものをダウンロードしてインストール](https://posit.co/downloads/)
+
+
+## RStudio 使い方
+
+ここからはRStudio IDE上で操作をします（ややハンズオン）
+
+
+### 左下
+Console: Rを実行するための領域。改行ごとにコードが実行され、一行ずつ対話的に作業ができる。複数行コピーして貼り付ければ一度に複数行実行できる。Shift+Enterで複数行入力も可能。
+
+### 左上
+Source: ファイルの編集のタブ。Rのコードをファイルにまとめておくと、都度コードを打たずに次回同じコードを正しい順序で実行できる。
+
+### 右下
+Files: 今のディレクトリ（フォルダ）にあるファイルが見える
+Plots: グラフを描画した際に出力される。
+Help: help(関数名)や ?関数名 などで表示されるHelpの内容が表示される。
+
+
+### 右上
+Environment: 今ある変数の一覧。値も表示される。データフレームなどは選択すると左上に内容が表示される。
+History: Consoleで入力した履歴が見れる。To ConsoleやTo Sourceで選択した内容をConsoleやSourceのファイルに追加することができる。
+
+## Consoleでいろいろ触ってみる。
+
+以下追加。
+
+```r
+plot(AirPassengers)
+
+hist(airmiles)
+
+plot(mtcars)
+
+View(mtcars)
+```
+
+## Environmentタブのデータを見てみる
+
+View()と同じ結果
+
+
+## Filesタブからデータを読み込んでみる
+
+xlsxやcsvのファイルをクリックするとデータの入力用のUIが出てくる
+設定がいろいろとできるので、Consoleで書かなくても（とりあえず）使うことができる
+細かい制御をするならreadrパッケージの使い方を覚えていこう（後述します）
+
+
+
+## コンソール上でRを動かして見る
+
+* Rの簡単なコマンド、文法など
+
+
+```{r}
+# 足し算
+# ここはコメントなので実行されない。
+1+1
+
+```
+
+
+
+```{r}
+# 1から10までのベクトルをつくる
+c(1:10)
+
+# 4番目と5番目を選ぶ
+C(1:10)[c(4,5)]
+```
+
+
+
+```{r}
+# 1から10までの合計を計算する
+sum(1:10)
+```
+
+
+
+```{r}
+# 変数xに代入して表示
+x <- 5
+print(x)
+
+# ()でくくると表示出来る
+(x <- 10)
+
+# こういうのも
+y <- x <- 20
+print(y)
+```
+
+
+
+Consoleに書いたものをRスクリプトに残していく。
+
+
+## プロジェクト
+
+* File -> New Project
+* Project毎に設定するものはTools Project Options
+
+
+## パッケージ、CRAN
+
+Rは便利なライブラリが揃っているので、上手く使うと手数を減らしたりミスが減る。
+
+
+```r
+install.packages("パッケージ名")
+```
+
+でCRANに登録されているライブラリをインストールできる。
+
+
+[GitHub](https://github.com/)にもパッケージはあるが、CRANのチェックは入っていない。自己責任で使用する。
+開発バージョンとして、最新の機能を試す時などに。自分でパッケージを作ることも出来る。
+
+
+
+## tidyverse
+
+* [tidyverseパッケージ](https://www.tidyverse.org/packages/)は便利なライブラリの集合。
+* データの前処理、ハンドリング、可視化まで基本的なことはほとんどこれで対応できる。
+モデリングは tidymodelsに
+
+* readr
+* dplyr
+
+* 主にデータフレームの操作について
+
+データハンドリングのための前知識
+* エクセルのシートのイメージ
+
+readr::read_csvで読める形式にするまで（前処理、文字列処理）→応用にて
+データフレームの操作
+
+概念
+データの前処理、可視化
+base Rは文法的に統一されていなかった。洗練。
+
+
+## パイプ
+
+特にtidyverseの関数群は第一引数にデータフレームを与え、引数に与えられた元のデータフレームに対して変更を加えず、データフレームを返す。第二引数はそのデータフレームに対して操作をするための条件となるものを与える。
+
+
+このデータをつぎつぎと次の関数に与えていく考え方と記法がマッチしている。
+
+元々はmagrittrパッケージにある %>% であったが、R自体に |> として取り込まれた。
+
+RStudio上のショートカットキー、Ctrl+Mでパイプ演算子を挿入できるが、"Global Options"の"Code"を選び"Use native pipe operator, |>"にチェックを入れるとCtrl+Mで出るパイプが"%>%"ではなく "|>"になる
+
+
+ただし、細かい違いがあるので注意。 `%>%`が廃止されるわけではないのでつかい続けても良いとおもう。
+
+
+* 細かい違いは下記
+  * [What are the differences between R's native pipe `|>` and the magrittr pipe `%>%`?](https://stackoverflow.com/questions/67633022/what-are-the-differences-between-rs-native-pipe-and-the-magrittr-pipe)
+
+
+
+
+## 列の選択
+
+```{r mtcars_skim, eval=F, echo=T}
+skimr::skim(datasets::mtcars)
+```
+
+<details>
+<summary> `skimr::skim()` の結果は長いので折り畳み</summary>
+```{r mtcars_skim, eval=T, echo=F}
+```
+</details>
+
+```r
+datasets::mtcars %>% select(mpg)
+```
+
+
+
+## 行の選択
+
+```{r}
+datasets::mtcars %>% filter(cyl==4)
+```
+
+
+
+
+
+# 応用編1
+
+
+
+## 実際のデータを見てみよう
+
+[Open Data Saitamaにある入間市のデータ](https://www.city.iruma.saitama.jp/soshiki/digitalgyosesuishinka/66/tokei/1948.html)
+
+csvファイルだが、CP932、いわゆるShift-JISで書かれている(MS Excelの場合、逆にUTF-8だと文字化けするので、OpenDataとしては多分この方が良い）
+そのままで`read_csv`すると文字化けするため、エンコーディングの指定をする。
+
+
+政府推奨フォーマットは[自治体標準オープンデータセット（正式版）](https://www.digital.go.jp/resources/open_data/municipal-standard-data-set-test/)が公開されたので今後形式が変わる可能性がある点に注意。
+
+```{r}
+df <- read_csv("kankouti-irumashi.csv", locale = locale(encoding = "CP932"))
+```
+
+
+
+## データフレームの確認
+
+OpenDataは整備されているので、読み込みでトラブルになることはないが、データを作るところから始める場合、まずデータを正しく読み込めるか？意図した形式になっているか？が1つのチェックポイントになる。
+A
+* read_csvの出力を見る
+* str(df) # 上記の詳細版
+* View(df) # Viewer Pane上で実際のデータが目視確認出来る
+
+
+緯度経度の情報がないことが確認出来た(leafletで扱うときに何も表示されない）
+可視化はうまくいかなかったときのデバッグのために、元データまで戻って確認することが多いので、あらかじめチェックすべき項目を作ってデータ読み込み時にある程度確認できた方が良い。
+
+## エクセルファイルの読み込み
+
+[Open Data Saitama【入間市】文化財一覧（政府推奨フォーマット）](https://opendata.pref.saitama.lg.jp/data/dataset/cultural-property/resource/98c39c94-6f43-42b7-a00e-1ba05f561ebe)を使用する（CC-BYライセンスで公開）
+
+readxlパッケージでエクセルファイルも読める
+日本語の列でも読み込める
+
+```{r echo=F}
+readxl::read_excel("112259culturalproperty.xlsx") -> df
+```
+
+
+```{r eval=F}
+readxl::read_excel("112259culturalproperty.xlsx") -> df
+# RStudio上ではView()を使うことで、Viewer Paneにデータを表示出来る。
+# データフレーム以外のlistやオブジェクトにも対応しているので、目視確認したいときに。
+View(df)
+```
+
+## 要約系パッケージ
+
+データをいじる前に、対象のデータフレームの概要を掴んでおくのは大事。`summary`でもシンプルなデータは見れるが、列が多かったり数字や文字列など色々な型があると見づらい。
+
+<details>
+<summary> `summary(df)` の結果は長いので折り畳み</summary>
+
+```{r}
+summary(df)
+```
+</details>
+
+
+`tibble` は列が多いと省略してしまうので、`head`では全体を確認しづらいが、`glimpse`は見やすい。
+
+<details>
+<summary> `head(df)` の結果は長いので折り畳み</summary>
+
+```{r}
+head(df)
+```
+</details>
+```{r df_gplimpse, eval=F, echo=T}
+dplyr::glimpse(df)
+```
+<details>
+<summary> `dplyr::glimpse(df)` の結果は長いので折り畳み</summary>
+
+```{r df_gplimpse, eval=T, echo=F}
+```
+</details>
+
+
+
+## 新しく列を作る(`dplyr::mutate()`)
+
+
+他のOpenDataについて見てみる。[【入間市】子育て施設一覧（政府推奨フォーマット）](https://opendata.pref.saitama.lg.jp/data/dataset/preschool-irumashi/resource/a79bd9a1-67e1-4183-9fe0-6286a4dadc1f)は緯度と経度が文字列になっている。
+
+
+変数には型がある。論理型（True/False）、整数型、Double、複素数、Raw、文字列、ファクタ型などなど。
+
+
+```{r}
+readxl::read_excel("112259preschool.xlsx") -> df3
+```
+
+
+```{r}
+df3 %>% mutate(緯度 = as.numeric(緯度)) %>% mutate(経度 = as.numeric(経度)) -> df3
+```
+
+
+## 異常値や欠測値を見つけたい（要約系パッケージを使う）
+
+ただし、これらは欠測値や異常値のチェックは難しい。色々なパッケージがあるが、`skimr::skim()`がおススメ。
+
+
+```{r df_skim, eval=F, echo=T}
+df %>% skimr::skim()
+```
+
+<details>
+<summary> `skimr::skim()` の結果は長いので折り畳み</summary>
+```{r df_skim, eval=T, echo=F}
+```
+</details>
+
+
+`hist`や`plot`で軽く確認するのも良い。後述。
+
+
+## 欠測や異常値を削除
+
+dplyr::filter 条件を指定して行を選択する。
+
+下記で緯度や経度の列にある値がNAではない行だけを取り出す
+
+```{r}
+df %>% filter(!is.na(緯度)) %>% filter(!is.na(経度)) %>% filter(経度>1000) %>% glimpse
+```
+
+`蓮花院観音堂付勧進帳` の経度に小数点付け忘れ？がある。
+今回は除去する。（作成者に報告と確認）
+
+
+<details>
+<summary> `skimr::skim()` の結果は長いので折り畳み</summary>
+
+```{r}
+df %>% filter(!is.na(緯度)) %>% filter(!is.na(経度)) %>% filter(経度<1000) -> df # →でも代入
+skimr::skim(df) # missingとmean, histをチェック
+```
+</details>
+
+
+## 列名の変更(dplyr::rename)
+
+`rename(新しい列名=元の列名)` で指定する。日本語の列名でも問題は（ほぼ）起こらないけど、英数字の方が扱いやすい。
+
+```{r}
+df %>% rename(lat=緯度) %>% rename(lng=経度) -> df 
+```
+
+baseのplotで散布図（外れ値の目視確認）
+
+```{r}
+df %>% with(. ,plot(lat, lng))
+```
+
+もちろん、`ggplot2` パッケージを使用してもOK。お好みで。パッとデータを確認するのはbaseのplotやhistなどを使うと記述が簡便です。
+
+```{r}
+# library(tidyverse)でggplot2パッケージは一緒にロードされる
+# 単体で使う場合はlibrary(ggplot2)で。
+df %>% ggplot()+geom_point(aes(x=lat, y=lng))
+```
+
+
+
+# 応用編2
+
+## ～データフレームを結合し、地図に表示してみる～
+
+
+最後に、やや発展的な内容に入りますが、Open Data Saitamaのデータを使って地図上にマーカーを付けてみましょう。Rで地図の表示は {leaflet} パッケージを使います。
+
+
+利用するのは、[【入間市】文化財一覧（政府推奨フォーマット）](https://opendata.pref.saitama.lg.jp/data/dataset/cultural-property/resource/98c39c94-6f43-42b7-a00e-1ba05f561ebe)と、[【入間市】公共施設情報（図書館）（政府推奨フォーマット）](https://opendata.pref.saitama.lg.jp/data/dataset/library-irumashi/resource/ccc53639-c482-49f3-99f9-bc4d11350ef0)と、
+[【入間市】子育て施設一覧（政府推奨フォーマット）](https://opendata.pref.saitama.lg.jp/data/dataset/preschool-irumashi/resource/a79bd9a1-67e1-4183-9fe0-6286a4dadc1f)です。
+
+
+まずはこれらの3つのデータの座標情報を使うために、3つのデータを読み込んでひとつにまとめます。
+
+`dplyr::bind_row()` を使うと、でデータフレームを縦につなげることができます。同じ列名なら列名が異なる場合は新しく追加されます。
+
+結合したのち、欠測値と異常値を除去して地図にプロットします。
+
+色分けのために、`mutate`で色とアイコン名を追加。全ての行にそれぞれの色が入ります（`View()`などで確認してみましょう）
+
+
+```{r echo=F}
+
+# icontextは地図上にアイコンを表示するために付けています。ここではそういうものか程度に。
+# leafletパッケージはfontawesomeのいくつかのアイコンが上手く表示出来たいため、応急処置的な方法です（地図の見た目を優先しました）
+
+
+readxl::read_excel("112259culturalproperty.xlsx") -> df1
+
+df1 %>% mutate(color= "green") %>% mutate(icontext = unclass(fa("monument"))) -> df1
+
+readxl::read_excel("112259publicfacility.xlsx") -> df2
+
+df2 %>% mutate(color= "lightblue")  %>% mutate(icontext = unclass(fa("building")))  -> df2
+
+readxl::read_excel("112259preschool.xlsx") -> df3
+
+df3 %>% mutate(color= "pink")  %>% mutate(icontext = unclass(fa("children"))) -> df3
+
+```
+
+
+
+```{r}
+
+df3 %>% mutate(緯度 = as.numeric(緯度)) %>% mutate(経度 = as.numeric(経度)) -> df3
+
+dplyr::bind_rows(df1, df2) %>% dplyr::bind_rows(df3) %>% 
+  filter(!is.na(緯度)) %>% filter(!is.na(経度)) %>% 
+  filter(経度<1000) -> df
+```
+
+
+<details>
+<summary> `skimr::skim()` の結果は長いので折り畳み</summary>
+```{r}
+df %>% skimr::skim()
+```
+</details>
+
+
+地図にプロットするには {leaflet} パッケージを使う。あらかじめインストールとロードをしておく。
+
+```{r}
+# library(leaflet)
+# library(fontawesome)
+# Iconまわりはちょっとクセがあるのでここではおまじないとして。
+
+df %>% # mutate(icontext = fa(icontext)) %>% 
+leaflet(options = leafletOptions(minZoom = 8, maxZoom = 18)) %>%
+      addTiles() %>% 
+       addAwesomeMarkers(lng = ~経度, lat = ~緯度, label = ~名称, icon= makeAwesomeIcon(text = ~icontext, library = "fa", markerColor= ~color))
+```
+
+
+無事に結合したデータフレームにある施設を地図上にプロットできた！
+
+
+少し応用的な内容になってしまいましたが、思ったより少ない手順で結果を見れることに気づくと思います。R言語はデータを楽して扱うことが出来るので、まずはやってみましょう！
+
+
+## データフレームの操作はまだまだ色々ある。
+
+
+Web上に色々な資料があるので、見てみましょう。
+
+
+https://speakerdeck.com/yutannihilation/tidyr-pivot
+
+https://ymattu.github.io/TokyoR103/slide.html#/inthiscase
+
+
+## フクザツ！！？？
+
+* すでにある機能を使いこなす ≒ ライブラリとその関数を使いこなす 
+* 関数の使い方は習うより慣れろ
+* helpを読もう。{felp}パッケージも良いよ。
+
+* TokyoRの過去の資料がWeb上に沢山あり、わかりやすい。
+* ブログも同様に。
+* ChatGPTが色々答えてくれるので沢山効いてみよう（これは3.5の方）。雑に聞いても親切。
+
+![](images/clipboard-3052766041.png){width=70%}
+
+  * たまに嘘を言ってくるので注意。
+      * あまり有名じゃないライブラリの使い方は特に
+
+
+## Enjoy!!
+
+
